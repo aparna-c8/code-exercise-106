@@ -83,7 +83,7 @@ public class EmployeeService {
         // finding the employees with long reporting line
         Map<Integer, Integer> depthMap = new HashMap<>();
         AtomicInteger counter=new AtomicInteger();
-        rec(ceoId, depthMap, counter, longManagerList);
+        findDepth(ceoId, depthMap, counter, longManagerList);
         result.setManagersEarningLess(managersEarningLess);
         result.setManagersEarningMore(managersEarningMore);
         result.setEmployeesWithLongReportingLine(longManagerList);
@@ -98,11 +98,11 @@ public class EmployeeService {
      * @param counter To count the levels traversed
      * @param longManagerList Employee's with long reporting line will be added to this list
      */
-    private void rec(int id, Map<Integer, Integer> depthMap, AtomicInteger counter, List<Employee> longManagerList) {
+    private void findDepth(int id, Map<Integer, Integer> depthMap, AtomicInteger counter, List<Employee> longManagerList) {
         if (reporteesById.get(id) != null){
             for (Employee emp : reporteesById.get(id)) {
                 counter.incrementAndGet();
-                rec(emp.getId(), depthMap, counter, longManagerList);
+                findDepth(emp.getId(), depthMap, counter, longManagerList);
             }
         }
         depthMap.put(id, counter.get());
