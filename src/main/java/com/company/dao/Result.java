@@ -15,8 +15,8 @@ public class Result {
 
     @Override
     public String toString() {
-        return "Managers earning less than their Subordinates: "
-                + managersEarningLess + "\nManagers earning more than their Subordinates: "
-                + managersEarningMore + "\nEmployees having long reporting line: " + employeesWithLongReportingLine;
+        return "\nManagers earning less than their Subordinates: \n"
+                + managersEarningLess + "\nManagers earning more than their Subordinates: \n"
+                + managersEarningMore + "\nEmployees having long reporting line: \n" + employeesWithLongReportingLine;
     }
 }

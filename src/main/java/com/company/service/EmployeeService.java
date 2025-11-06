@@ -37,7 +37,8 @@ public class EmployeeService {
                 String[] fields = line.split(",");
                 Employee employee = new Employee(
                         Integer.parseInt(fields[0]), fields[1], fields[2], Integer.parseInt(fields[3]),
-                        (fields.length < 5 || fields[4].isBlank()) ? -1:Integer.parseInt(fields[4]));
+                        (fields.length < 5 || fields[4].isBlank()) ? -1:Integer.parseInt(fields[4])
+                );
                 if (employee.getManagerId() == -1) {
                     setCeoId(employee.getId());
                 } else {
