@@ -25,7 +25,6 @@ public class EmployeeService {
      * This method reads the csv file from resources and
      * populates employeeById and reporteesById maps for later use.
      * @param path The path to the csv file
-     * @throws IOException
      */
     private void readCsvFile(String path){
         try (InputStream is = EmployeeService.class.getResourceAsStream(path);
@@ -36,15 +35,12 @@ public class EmployeeService {
 
             while ((line = br.readLine()) != null) {
                 String[] fields = line.split(",");
-                Employee employee = new Employee();
-                employee.setId(Integer.parseInt(fields[0]));
-                employee.setFirstName(fields[1]);
-                employee.setLastName(fields[2]);
-                employee.setSalary(Integer.parseInt(fields[3]));
-                if (fields.length < 5 || fields[4].isBlank()) {
-                    ceoId = employee.getId();
+                Employee employee = new Employee(
+                        Integer.parseInt(fields[0]), fields[1], fields[2], Integer.parseInt(fields[3]),
+                        (fields.length < 5 || fields[4].isBlank()) ? -1:Integer.parseInt(fields[4]));
+                if (employee.getManagerId() == -1) {
+                    setCeoId(employee.getId());
                 } else {
-                    employee.setManagerId(Integer.parseInt(fields[4]));
                     List<Employee> liSub = reporteesById.getOrDefault(employee.getManagerId(), new ArrayList<>());
                     liSub.add(employee);
                     reporteesById.put(employee.getManagerId(), liSub);
@@ -59,7 +55,7 @@ public class EmployeeService {
     /**
      * This method is responsible for finding all three required results.
      * @param path The path to the csv file
-     * @return
+     * @return Result DAO which contains all three required list of Employees
      */
     public Result findResults(String path) {
         Result result = new Result();
@@ -70,6 +66,7 @@ public class EmployeeService {
 
         readCsvFile(path);
 
+        // finding under earned and over earned managers
         for (int managerId : reporteesById.keySet()) {
             int sum = 0;
             for (Employee emp : reporteesById.get(managerId)) {
@@ -82,6 +79,7 @@ public class EmployeeService {
             }
         }
 
+        // finding the employees with long reporting line
         Map<Integer, Integer> depthMap = new HashMap<>();
         AtomicInteger counter=new AtomicInteger();
         rec(ceoId, depthMap, counter, longManagerList);
@@ -99,7 +97,7 @@ public class EmployeeService {
      * @param counter To count the levels traversed
      * @param longManagerList Employee's with long reporting line will be added to this list
      */
-    public void rec(int id, Map<Integer, Integer> depthMap, AtomicInteger counter, List<Employee> longManagerList) {
+    private void rec(int id, Map<Integer, Integer> depthMap, AtomicInteger counter, List<Employee> longManagerList) {
         if (reporteesById.get(id) != null){
             for (Employee emp : reporteesById.get(id)) {
                 counter.incrementAndGet();
@@ -111,5 +109,9 @@ public class EmployeeService {
             longManagerList.add(employeeById.get(id));
         }
         counter.decrementAndGet();
+    }
+
+    public void setCeoId(int ceoId) {
+        this.ceoId = ceoId;
     }
 }
